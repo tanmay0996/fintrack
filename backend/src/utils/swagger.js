@@ -71,6 +71,7 @@ const options = {
       { name: "Users",     description: "User management (Admin only)" },
       { name: "Records",   description: "Financial records CRUD" },
       { name: "Dashboard", description: "Analytics and summary data" },
+      { name: "Admin",     description: "Admin-only endpoints — audit logs" },
     ],
   },
   apis: ["./src/routes/*.js"],

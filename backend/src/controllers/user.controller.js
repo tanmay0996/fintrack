@@ -4,6 +4,7 @@ import { prisma } from "../db/index.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { logAudit, getIp } from "../utils/auditLogger.js";
 
 const cookieOptions = {
   httpOnly: true,
@@ -43,6 +44,15 @@ const loginUser = asyncHandler(async (req, res) => {
     data: { refreshToken },
   });
 
+  logAudit({
+    action: "LOGIN",
+    resource: "USER",
+    resourceId: user.id,
+    userId: user.id,
+    details: { email: user.email, role: user.role },
+    ipAddress: getIp(req),
+  });
+
   const safeUser = { id: user.id, name: user.name, email: user.email, role: user.role };
 
   return res
@@ -56,6 +66,14 @@ const logoutUser = asyncHandler(async (req, res) => {
   await prisma.user.update({
     where: { id: req.user.id },
     data: { refreshToken: null },
+  });
+
+  logAudit({
+    action: "LOGOUT",
+    resource: "USER",
+    resourceId: req.user.id,
+    userId: req.user.id,
+    ipAddress: getIp(req),
   });
 
   return res
@@ -143,6 +161,15 @@ const createUser = asyncHandler(async (req, res) => {
     select: { id: true, name: true, email: true, role: true, isActive: true, createdAt: true },
   });
 
+  logAudit({
+    action: "CREATE",
+    resource: "USER",
+    resourceId: user.id,
+    userId: req.user.id,
+    details: { name: user.name, email: user.email, role: user.role },
+    ipAddress: getIp(req),
+  });
+
   return res.status(201).json(new ApiResponse(201, user, "User created successfully"));
 });
 
@@ -169,6 +196,19 @@ const updateUser = asyncHandler(async (req, res) => {
     select: { id: true, name: true, email: true, role: true, isActive: true, updatedAt: true },
   });
 
+  logAudit({
+    action: "UPDATE",
+    resource: "USER",
+    resourceId: userId,
+    userId: req.user.id,
+    details: {
+      ...(role && { role }),
+      ...(isActive !== undefined && { isActive }),
+      ...(name && { name }),
+    },
+    ipAddress: getIp(req),
+  });
+
   return res.status(200).json(new ApiResponse(200, updated, "User updated successfully"));
 });
 
@@ -182,6 +222,15 @@ const deleteUser = asyncHandler(async (req, res) => {
   if (!user) throw new ApiError(404, "User not found");
 
   await prisma.user.delete({ where: { id: userId } });
+
+  logAudit({
+    action: "DELETE",
+    resource: "USER",
+    resourceId: userId,
+    userId: req.user.id,
+    details: { email: user.email, name: user.name },
+    ipAddress: getIp(req),
+  });
 
   return res.status(200).json(new ApiResponse(200, {}, "User deleted successfully"));
 });

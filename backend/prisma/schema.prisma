@@ -28,12 +28,32 @@ model User {
   isActive     Boolean   @default(true)
   refreshToken String?
 
-  records FinancialRecord[]
+  records   FinancialRecord[]
+  auditLogs AuditLog[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([email])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  action     String   // LOGIN | LOGOUT | CREATE | UPDATE | DELETE
+  resource   String   // USER | RECORD
+  resourceId String?
+  details    Json?
+  ipAddress  String?
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([resource])
+  @@index([createdAt])
 }
 
 model FinancialRecord {

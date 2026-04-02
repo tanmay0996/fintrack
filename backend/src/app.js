@@ -6,6 +6,7 @@ import swaggerUi from "swagger-ui-express";
 import userRouter from "./routes/user.routes.js";
 import recordRouter from "./routes/record.routes.js";
 import dashboardRouter from "./routes/dashboard.routes.js";
+import auditLogRouter from "./routes/auditLog.routes.js";
 import { apiLimiter, authLimiter } from "./middleware/rateLimit.middleware.js";
 import { swaggerSpec } from "./utils/swagger.js";
 
@@ -34,6 +35,7 @@ app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { customSiteT
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/records", recordRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
+app.use("/api/v1/admin/audit-logs", auditLogRouter);
 
 // Global error handler
 app.use((err, req, res, next) => {

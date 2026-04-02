@@ -2,6 +2,7 @@ import { prisma } from "../db/index.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { logAudit, getIp } from "../utils/auditLogger.js";
 
 // Base filter — always exclude soft-deleted records
 const ACTIVE = { isDeleted: false };
@@ -96,6 +97,15 @@ const createRecord = asyncHandler(async (req, res) => {
     include: { createdBy: { select: { id: true, name: true, email: true } } },
   });
 
+  logAudit({
+    action: "CREATE",
+    resource: "RECORD",
+    resourceId: record.id,
+    userId: req.user.id,
+    details: { amount: record.amount, type: record.type, category: record.category },
+    ipAddress: getIp(req),
+  });
+
   return res.status(201).json(new ApiResponse(201, record, "Record created successfully"));
 });
 
@@ -125,6 +135,19 @@ const updateRecord = asyncHandler(async (req, res) => {
     include: { createdBy: { select: { id: true, name: true, email: true } } },
   });
 
+  logAudit({
+    action: "UPDATE",
+    resource: "RECORD",
+    resourceId: recordId,
+    userId: req.user.id,
+    details: {
+      ...(amount !== undefined && { amount: Number(amount) }),
+      ...(type && { type }),
+      ...(category && { category }),
+    },
+    ipAddress: getIp(req),
+  });
+
   return res.status(200).json(new ApiResponse(200, updated, "Record updated successfully"));
 });
 
@@ -138,6 +161,15 @@ const deleteRecord = asyncHandler(async (req, res) => {
   await prisma.financialRecord.update({
     where: { id: recordId },
     data: { isDeleted: true, deletedAt: new Date() },
+  });
+
+  logAudit({
+    action: "DELETE",
+    resource: "RECORD",
+    resourceId: recordId,
+    userId: req.user.id,
+    details: { amount: record.amount, type: record.type, category: record.category },
+    ipAddress: getIp(req),
   });
 
   return res.status(200).json(new ApiResponse(200, {}, "Record deleted successfully"));
