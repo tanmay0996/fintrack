@@ -37,12 +37,15 @@ model User {
 }
 
 model FinancialRecord {
-  id       String     @id @default(cuid())
-  amount   Float
-  type     RecordType
-  category String
-  date     DateTime
-  notes    String?
+  id        String     @id @default(cuid())
+  amount    Float
+  type      RecordType
+  category  String
+  date      DateTime
+  notes     String?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   createdBy   User   @relation(fields: [createdById], references: [id])
   createdById String
@@ -54,4 +57,5 @@ model FinancialRecord {
   @@index([category])
   @@index([date])
   @@index([createdById])
+  @@index([isDeleted])
 }

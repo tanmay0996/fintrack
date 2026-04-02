@@ -3,6 +3,9 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
+// Base filter — always exclude soft-deleted records
+const ACTIVE = { isDeleted: false };
+
 const getAllRecords = asyncHandler(async (req, res) => {
   const {
     page = 1,
@@ -18,7 +21,7 @@ const getAllRecords = asyncHandler(async (req, res) => {
 
   const skip = (Number(page) - 1) * Number(limit);
 
-  const where = {};
+  const where = { ...ACTIVE };
   if (type) where.type = type;
   if (category) where.category = category;
   if (startDate || endDate) {
@@ -42,9 +45,7 @@ const getAllRecords = asyncHandler(async (req, res) => {
       skip,
       take: Number(limit),
       orderBy: { [orderByField]: sortOrder === "asc" ? "asc" : "desc" },
-      include: {
-        createdBy: { select: { id: true, name: true, email: true } },
-      },
+      include: { createdBy: { select: { id: true, name: true, email: true } } },
     }),
     prisma.financialRecord.count({ where }),
   ]);
@@ -61,8 +62,8 @@ const getAllRecords = asyncHandler(async (req, res) => {
 const getRecordById = asyncHandler(async (req, res) => {
   const { recordId } = req.params;
 
-  const record = await prisma.financialRecord.findUnique({
-    where: { id: recordId },
+  const record = await prisma.financialRecord.findFirst({
+    where: { id: recordId, ...ACTIVE },
     include: { createdBy: { select: { id: true, name: true, email: true } } },
   });
   if (!record) throw new ApiError(404, "Record not found");
@@ -102,7 +103,7 @@ const updateRecord = asyncHandler(async (req, res) => {
   const { recordId } = req.params;
   const { amount, type, category, date, notes } = req.body;
 
-  const record = await prisma.financialRecord.findUnique({ where: { id: recordId } });
+  const record = await prisma.financialRecord.findFirst({ where: { id: recordId, ...ACTIVE } });
   if (!record) throw new ApiError(404, "Record not found");
 
   if (type && !["INCOME", "EXPENSE"].includes(type)) {
@@ -127,13 +128,17 @@ const updateRecord = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, updated, "Record updated successfully"));
 });
 
+// Soft delete — sets isDeleted=true and records deletedAt timestamp
 const deleteRecord = asyncHandler(async (req, res) => {
   const { recordId } = req.params;
 
-  const record = await prisma.financialRecord.findUnique({ where: { id: recordId } });
+  const record = await prisma.financialRecord.findFirst({ where: { id: recordId, ...ACTIVE } });
   if (!record) throw new ApiError(404, "Record not found");
 
-  await prisma.financialRecord.delete({ where: { id: recordId } });
+  await prisma.financialRecord.update({
+    where: { id: recordId },
+    data: { isDeleted: true, deletedAt: new Date() },
+  });
 
   return res.status(200).json(new ApiResponse(200, {}, "Record deleted successfully"));
 });
