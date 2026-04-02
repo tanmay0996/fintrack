@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
@@ -23,20 +23,16 @@ const LoginPage = () => {
   const { login, user } = useAuth();
   const navigate = useNavigate();
 
-  if (user) {
-    navigate("/dashboard", { replace: true });
-    return null;
-  }
-
+  // All hooks must be called unconditionally before any early returns
   const {
     register,
     handleSubmit,
     setValue,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(loginSchema) });
 
-  const emailValue = watch("email");
+  // Safe early return using Navigate component (after all hooks)
+  if (user) return <Navigate to="/dashboard" replace />;
 
   const onSubmit = async (data) => {
     try {

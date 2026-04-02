@@ -86,7 +86,11 @@ const Navbar = ({ onMenuClick }) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            className="w-52 glass-card border-white/8 rounded-xl shadow-2xl"
+            className="w-52 rounded-xl shadow-2xl border"
+            style={{
+              background: "oklch(0.14 0.022 265)",
+              borderColor: "oklch(0.93 0.008 240 / 12%)",
+            }}
           >
             <DropdownMenuLabel className="pb-2">
               <p className="font-semibold text-foreground">{user?.name}</p>
