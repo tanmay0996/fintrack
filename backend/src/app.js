@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import userRouter from "./routes/user.routes.js";
 import recordRouter from "./routes/record.routes.js";
 import dashboardRouter from "./routes/dashboard.routes.js";
+import { apiLimiter, authLimiter } from "./middleware/rateLimit.middleware.js";
 
 const app = express();
 
@@ -18,6 +19,11 @@ app.use(
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(cookieParser());
+
+// Rate limiting — applied before routes
+app.use("/api/v1", apiLimiter);
+app.use("/api/v1/users/login", authLimiter);
+app.use("/api/v1/users/refresh-token", authLimiter);
 
 // Routes
 app.use("/api/v1/users", userRouter);
