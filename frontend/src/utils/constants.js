@@ -1,0 +1,15 @@
+export const CATEGORIES = [
+  "Salary",
+  "Freelance",
+  "Investment",
+  "Business",
+  "Food",
+  "Transport",
+  "Housing",
+  "Utilities",
+  "Healthcare",
+  "Entertainment",
+  "Education",
+  "Shopping",
+  "Other",
+];
