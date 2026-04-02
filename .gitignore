@@ -1,0 +1,13 @@
+node_modules/
+.env
+dist/
+build/
+.DS_Store
+*.log
+coverage/
+.nyc_output/
+prisma/migrations/
+
+# Assignment docs — never push
+requirements.md
+CODING_STANDARDS.md
