@@ -14,9 +14,9 @@ const loginSchema = z.object({
 });
 
 const DEMO_CREDENTIALS = [
-  { role: "Admin", email: "admin@fintrack.com", password: "Admin@123", color: "from-violet-500 to-purple-600" },
-  { role: "Analyst", email: "analyst@fintrack.com", password: "Analyst@123", color: "from-cyan-500 to-blue-600" },
-  { role: "Viewer", email: "viewer@fintrack.com", password: "Viewer@123", color: "from-emerald-500 to-teal-600" },
+  { role: "Admin",   email: "admin@fintrack.com",   password: "Admin@123",   gradient: "linear-gradient(135deg, #8b5cf6, #7c3aed)" },
+  { role: "Analyst", email: "analyst@fintrack.com", password: "Analyst@123", gradient: "linear-gradient(135deg, #06b6d4, #2563eb)" },
+  { role: "Viewer",  email: "viewer@fintrack.com",  password: "Viewer@123",  gradient: "linear-gradient(135deg, #10b981, #0d9488)" },
 ];
 
 const LoginPage = () => {
@@ -214,7 +214,7 @@ const LoginPage = () => {
                 >
                   <span
                     className="absolute inset-0 opacity-80 group-hover:opacity-100 transition-opacity"
-                    style={{ background: `linear-gradient(135deg, ${cred.color.replace("from-", "").replace(" to-", ", ")})` }}
+                    style={{ background: cred.gradient }}
                   />
                   <span className="relative">{cred.role}</span>
                 </motion.button>
