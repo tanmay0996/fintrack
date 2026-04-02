@@ -1,11 +1,13 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import swaggerUi from "swagger-ui-express";
 
 import userRouter from "./routes/user.routes.js";
 import recordRouter from "./routes/record.routes.js";
 import dashboardRouter from "./routes/dashboard.routes.js";
 import { apiLimiter, authLimiter } from "./middleware/rateLimit.middleware.js";
+import { swaggerSpec } from "./utils/swagger.js";
 
 const app = express();
 
@@ -24,6 +26,9 @@ app.use(cookieParser());
 app.use("/api/v1", apiLimiter);
 app.use("/api/v1/users/login", authLimiter);
 app.use("/api/v1/users/refresh-token", authLimiter);
+
+// Swagger UI
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { customSiteTitle: "FinTrack API Docs" }));
 
 // Routes
 app.use("/api/v1/users", userRouter);
