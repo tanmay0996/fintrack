@@ -66,10 +66,10 @@ const Navbar = ({ onMenuClick }) => {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <motion.button
+            <motion.div
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-white/5 transition-colors outline-none"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-white/5 transition-colors outline-none cursor-pointer"
             >
               {/* Avatar */}
               <div
@@ -82,7 +82,7 @@ const Navbar = ({ onMenuClick }) => {
                 <p className="text-sm font-medium text-foreground leading-tight">{user?.name}</p>
               </div>
               <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
-            </motion.button>
+            </motion.div>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
