@@ -152,3 +152,4 @@ All routes prefixed with `/api/v1/`
 - **Native fetch** — no axios; a thin `api.js` wrapper handles auth headers, base URL, and error normalization
 - **Zod on forms** — frontend validation mirrors backend constraints so the user gets instant feedback before any network call
 - **Seed script** — `src/db/seed.js` uses `upsert` so it's safe to run multiple times without duplicating users
+
